@@ -81,6 +81,20 @@ BOOKING_TOOLS: list[AIToolDefinition] = [
             "required": ["event_id"],
         },
     ),
+    AIToolDefinition(
+        name="escalate_to_human",
+        description="Richiede l'intervento del Coach o gestisce richieste complesse.",
+        parameters={
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string",
+                    "description": "Motivo per cui è necessario il subentro umano.",
+                },
+            },
+            "required": ["reason"],
+        },
+    ),
 ]
 
 
@@ -104,6 +118,12 @@ class BookingToolExecutor:
                 return await self._book_appointment(arguments)
             elif tool_name == "cancel_appointment":
                 return await self._cancel_appointment(arguments)
+            elif tool_name == "escalate_to_human":
+                return json.dumps({
+                    "status": "escalated",
+                    "reason": arguments.get("reason", "Richiesta assistenza diretta"),
+                    "note": "Il Coach è stato avvisato e subentrerà nella chat a breve.",
+                })
             else:
                 return json.dumps({"error": f"Tool sconosciuto '{tool_name}'"})
         except Exception as exc:
