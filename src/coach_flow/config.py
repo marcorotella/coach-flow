@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     PT_NAME: str = "Coach"
     PT_PHONE_NUMBER: str = ""
     CALENDAR_PROVIDER: str = "google"
+    DEFAULT_VOICE_MEMO_URL: str = ""
 
     # AI Configuration
     AI_PROVIDER: str = "openai"
