@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Proposta: Assistente AI WhatsApp per Personal Trainer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 10mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.45;
+      font-size: 9.5pt;
+    }
+
+    .page {
+      box-sizing: border-box;
+      padding-bottom: 5px;
+    }
+    .page-1 {
+      page-break-after: always;
+      break-after: page;
+    }
+    .page-2 {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f5f9;
+      margin-bottom: 14px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 13pt;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .badge-tag {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 3px 10px;
+      background: #ecfdf5;
+      color: #059669;
+      border-radius: 999px;
+      border: 1px solid #a7f3d0;
+    }
+
+    /* Hero / Title */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 20px 22px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.12);
+    }
+
+    .hero h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      line-height: 1.22;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      font-size: 9.5pt;
+      color: #cbd5e1;
+      max-width: 95%;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span {
+      display: inline-block;
+      width: 5px;
+      height: 16px;
+      background: #10b981;
+      border-radius: 3px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .card-icon {
+      font-size: 16pt;
+      margin-bottom: 4px;
+    }
+
+    .card h3 {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .card p {
+      font-size: 8.5pt;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* WhatsApp Simulation Box */
+    .wa-preview {
+      background: #efeae2;
+      border: 1px solid #d1d7db;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      background-image: radial-gradient(#d4ccc3 1px, transparent 1px);
+      background-size: 14px 14px;
+    }
+
+    .wa-bubble {
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px 10px 10px 2px;
+      max-width: 82%;
+      margin-bottom: 6px;
+      font-size: 8.5pt;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    .wa-bubble.outbound {
+      background: #d9fdd3;
+      margin-left: auto;
+      border-radius: 10px 10px 2px 10px;
+    }
+
+    .wa-audio {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #d9fdd3;
+      padding: 6px 12px;
+      border-radius: 10px 10px 2px 10px;
+      margin-left: auto;
+      max-width: 78%;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    .audio-play-btn {
+      width: 22px;
+      height: 22px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 10px;
+    }
+
+    /* Benefit Banner */
+    .benefit-banner {
+      background: #ecfdf5;
+      border-left: 4px solid #10b981;
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 14px;
+    }
+
+    .benefit-banner h4 {
+      color: #065f46;
+      font-size: 9.5pt;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .benefit-banner p {
+      color: #047857;
+      font-size: 8.5pt;
+    }
+
+    /* Steps */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .step-number {
+      width: 24px;
+      height: 24px;
+      background: #0f172a;
+      color: white;
+      border-radius: 6px;
+      font-size: 9pt;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 8.5pt;
+      color: #64748b;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.5pt;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGINA 1: VISION, OUTREACH E BOOKING -->
+  <div class="page page-1">
+    <div>
+      <div class="header">
+        <div class="logo-badge">
+          <div class="logo-icon">PT</div>
+          <span>AI Coach Secretary</span>
+        </div>
+        <div class="badge-tag">Progetto Esclusivo WhatsApp</div>
+      </div>
+
+      <div class="hero">
+        <h1>Il tuo Assistente Personale su WhatsApp.<br>Zero perdite di tempo, agende piene.</h1>
+        <p>Un sistema intelligente che converte i nuovi contatti in appuntamenti reali sul tuo calendario e azzera i no-show dei tuoi allievi, senza farti passare ore a rincorrere messaggi.</p>
+      </div>
+
+      <div class="benefit-banner">
+        <h4>🎯 L'Obiettivo per te</h4>
+        <p>Tu pensi solo ad allenare con la massima energia. L'assistente si occupa di contattare i lead, proporre gli orari liberi, aggiornare Google Calendar e farsi confermare la presenza.</p>
+      </div>
+
+      <div class="section-title">
+        <span></span> Come Trasforma la tua Giornata
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-icon">🎙️</div>
+          <h3>1. Primo Contatto ad Alto Impatto</h3>
+          <p>Quando arriva un nuovo contatto, l'assistente invia un messaggio su misura e una <b>nota vocale con la tua voce</b>. Il cliente percepisce subito calore ed empatia autentica.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📅</div>
+          <h3>2. Fissa Appuntamenti da Solo</h3>
+          <p>Dialoga con il prospect come una vera segretaria: capisce le sue preferenze, <b>legge in tempo reale Google Calendar</b>, propone gli slot liberi e fissa la seduta.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">✅</div>
+          <h3>3. Zero No-Show (Conferme 1-Click)</h3>
+          <p>24 ore prima invia un promemoria con bottoni WhatsApp: <i>Confermo</i>, <i>Sposta</i> o <i>Annulla</i>. Se l'allievo sposta, l'AI trova subito una nuova data e libera il vecchio slot.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🛎️</div>
+          <h3>4. Promemoria Dedicati per Te</h3>
+          <p>Ogni mattina ricevi il riepilogo degli atleti del giorno su WhatsApp. 30 minuti prima di ogni sessione ti avvisa su chi sta arrivando e con quale obiettivo.</p>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span></span> Esempio di Esperienza del Tuo Cliente su WhatsApp
+      </div>
+
+      <div class="wa-preview">
+        <div class="wa-bubble outbound">
+          <b>Tu (AI Assistant):</b> Ciao Marco! Ho visto la tua richiesta per tornare in forma. Ho 2 minuti tra una sessione e l'altra e volevo lasciarti un saluto veloce 👇
+        </div>
+        <div class="wa-audio">
+          <div class="audio-play-btn">▶</div>
+          <div style="font-size: 8pt; color: #065f46;">
+            <b>Nota vocale (0:18)</b> • <i>"Ciao Marco! Piacere, ti andrebbe di fare una chiacchierata e prima valutazione in studio?..."</i>
+          </div>
+        </div>
+        <div class="wa-bubble">
+          <b>Marco (Prospect):</b> Ciao! Sì volentieri, ma lavoro fino a tardi. Saresti libero giovedì dopo le 18:30?
+        </div>
+        <div class="wa-bubble outbound">
+          <b>Tu (AI Assistant):</b> Assolutamente sì! Giovedì ho libero alle <b>18:45</b> oppure venerdì alle <b>19:00</b>. Quale ti torna più comodo per la prima consulenza?
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Proposta Tecnica & Operativa per Personal Trainer</span>
+      <span>Pagina 1 di 2</span>
+    </div>
+  </div>
+
+  <!-- PAGINA 2: FUNZIONAMENTO, CALENDARIO, CONTROLLO E SICUREZZA -->
+  <div class="page page-2">
+    <div>
+      <div class="header">
+        <div class="logo-badge">
+          <div class="logo-icon">PT</div>
+          <span>AI Coach Secretary</span>
+        </div>
+        <div class="badge-tag">Affidabilità & Semplicità</div>
+      </div>
+
+      <div class="section-title">
+        <span></span> Come Funziona il Flusso Completo
+      </div>
+
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Acquisizione del Contatto</h4>
+            <p>Un potenziale allievo lascia il numero (Instagram, passaparola o modulo). Il sistema attiva istantaneamente l'outreach con messaggio e nota vocale.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Conversazione Intelligente & Sincronizzazione</h4>
+            <p>L'AI gestisce l'interazione con tono motivante. Consulta direttamente il tuo calendario per evitare sovrapposizioni e rispetta le tue pause tra una sessione e l'altra.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Conferma Immediata su Google Calendar</h4>
+            <p>Appena scelto l'orario, l'appuntamento compare sul tuo calendario. Sia tu che l'allievo ricevete un promemoria riassuntivo.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Gestione No-Show con Bottoni WhatsApp</h4>
+            <p>Un giorno prima, il cliente riceve il memo con bottoni rapidi. Se preme <i>"Sposta data"</i>, l'AI riprogramma la seduta senza farti perdere tempo in telefonate.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span></span> Sei Sempre Tu ad Avere il Totale Controllo
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>🛡️ Canale Ufficiale WhatsApp (Zero Ban)</h3>
+          <p>Usiamo l'infrastruttura ufficiale Meta Business Cloud. Nessun trucco o rischio di blocco del tuo numero: tutto è sicuro, professionale e a norma di legge (GDPR).</p>
+        </div>
+
+        <div class="card">
+          <h3>🔄 Aperto al Futuro</h3>
+          <p>Iniziamo con <b>Google Calendar</b> (che hai già sul telefono), ma l'architettura è modulare: se domani vorrai passare ad Apple Calendar, Outlook o app gestionali, si collegherà subito.</p>
+        </div>
+
+        <div class="card">
+          <h3>🙋‍♂️ Subentro Umano Istantaneo</h3>
+          <p>Se un allievo ha domande particolari (es. infortuni o problematiche fisiche delicate), l'assistente ti manda subito un alert su WhatsApp così puoi intervenire di persona nella chat.</p>
+        </div>
+
+        <div class="card">
+          <h3>💰 Costi di Gestione Quasi Nulli</h3>
+          <p>Grazie all'ottimizzazione dell'intelligenza artificiale, i costi dei messaggi e dell'AI per il volume tipico di un personal trainer ammontano a <b>pochi euro al mese</b> (meno di una colazione a settimana!).</p>
+        </div>
+      </div>
+
+      <div class="benefit-banner" style="background: #f8fafc; border-left-color: #0f172a; margin-top: 8px;">
+        <h4 style="color: #0f172a;">🚀 I Prossimi Passi per Partire</h4>
+        <p style="color: #475569;">1. Registriamo il tuo messaggio audio di benvenuto (15 secondi).<br>
+        2. Colleghiamo il tuo Google Calendar e definiamo i tuoi orari ideali di lavoro.<br>
+        3. Testiamo il primo flusso direttamente sul tuo telefono!</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Proposta Tecnica & Operativa per Personal Trainer</span>
+      <span>Pagina 2 di 2</span>
+    </div>
+  </div>
+
+</body>
+</html>
