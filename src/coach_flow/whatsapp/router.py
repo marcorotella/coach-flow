@@ -31,6 +31,16 @@ def _create_default_agent() -> BookingAgent:
 # Module-level instances for message handling
 booking_agent: BookingAgent = _create_default_agent()
 whatsapp_client: WhatsAppClient = WhatsAppClient()
+_trainer_assistant: Any = None
+
+
+def get_trainer_assistant():
+    global _trainer_assistant
+    if _trainer_assistant is None:
+        from coach_flow.assistant.trainer import TrainerAssistantService
+
+        _trainer_assistant = TrainerAssistantService()
+    return _trainer_assistant
 
 
 @router.get("/webhook")
@@ -123,7 +133,18 @@ async def handle_interactive_button(
 
 async def handle_text_message(sender_phone: str, text: str) -> str:
     """Conversational text handler (AI Agent integration)."""
-    reply = await booking_agent.handle_incoming_message(sender_phone, text)
+    from coach_flow.assistant.trainer import HANDOVER_ACK_MESSAGE, TrainerAssistantService
+
+    if TrainerAssistantService.check_handover_intent(text):
+        assistant = get_trainer_assistant()
+        await assistant.trigger_human_handover(
+            sender_phone=sender_phone,
+            reason=f"Richiesta esplicita cliente: '{text}'",
+        )
+        reply = HANDOVER_ACK_MESSAGE
+    else:
+        reply = await booking_agent.handle_incoming_message(sender_phone, text)
+
     if whatsapp_client.access_token:
         try:
             await whatsapp_client.send_text_message(sender_phone, reply)
