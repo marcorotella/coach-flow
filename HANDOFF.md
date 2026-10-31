@@ -1,6 +1,6 @@
-# CoachFlow - Handover & Session Resume Document 📋
+# CoachFlow - Handover & Status Document 📋
 
-Questo documento serve a trasferire il contesto operativo completo dell'attività da questa sessione locale al server **`ai-terminal`** (sessione **`ai-agy`**).
+Progetto **CoachFlow** (`coach-flow`): assistente AI per Personal Trainer su WhatsApp (Discovery, Conversational Booking con Tool Calling, Anti No-Show a costo zero-LLM, Trainer Daily Digest e Human Handover).
 
 ---
 
@@ -11,58 +11,63 @@ Questo documento serve a trasferire il contesto operativo completo dell'attivit�
 - **Licenza:** MIT
 - **Directory di lavoro su `ai-terminal`:** `/home/marco/projects/coach-flow`
 - **Ambiente Python:** Python 3.11 con venv in `/home/marco/projects/coach-flow/.venv` (FastAPI, Pydantic, APScheduler, Pytest, Ruff)
-- **Stato Test:** 25 test passing (`pytest`), 0 errori di linting (`ruff check .`)
-- **CI Pipeline:** Green su GitHub Actions (Python 3.10, 3.11, 3.12)
+- **Stato Test:** **48/48 test passing** (`pytest`), **0 errori o warning di linting** (`ruff check .`)
+- **CI Pipeline:** Green su GitHub Actions per tutti i commit e PR su Python 3.10, 3.11 e 3.12.
 
 ---
 
-## 🎯 Obiettivi e Flussi di CoachFlow
+## 📋 Milestones e Issues su GitHub (100% COMPLETATE)
 
-Assistente AI su WhatsApp per Personal Trainer:
-1. **Discovery & Primo Contatto:** Invio primo messaggio WhatsApp + **nota vocale registrata dal coach** (formato audio nativo WhatsApp OGG/Opus).
-2. **Booking Conversazionale:** Negoziazione slot con AI, lettura/scrittura su **Google Calendar** (architettura modulare `BaseCalendarProvider`).
-3. **Anti No-Show (Costo Zero-LLM):** Promemoria interattivi a T-24h e T-2h con pulsanti (`Confermo ✅`, `Sposta 🔄`, `Annulla ❌`). Intercettati a livello deterministico senza sprecare token AI.
-4. **Trainer Assistant:** Daily Digest mattutino per il PT su WhatsApp e notifica di emergenza per subentro umano.
+Tutte le milestone e le 10 issue originali del progetto sono state implementate, testate e chiuse con PR verificate in CI:
+
+### Milestone 1: `v0.1.0 - Foundation & Modular Calendar Provider` ✅
+- [x] **#1:** Project scaffold, CI/CD, linting and base configuration
+- [x] **#2:** Core domain entities & data models (`Trainer`, `Client`, `Lead`, `Appointment`, `TimeSlot`, `WorkingHours`) (Chiusa con PR #11)
+- [x] **#3:** Modular Calendar Provider abstraction (`BaseCalendarProvider`, `MockCalendarProvider`, `GoogleCalendarProvider`) (Chiusa con PR #12)
+
+### Milestone 2: `v0.2.0 - WhatsApp Cloud API & Deterministic Engine` ✅
+- [x] **#4:** Meta WhatsApp Cloud API client, HMAC SHA-256 signature security & Webhook verification (`/whatsapp/webhook`) (Chiusa con PR #13)
+- [x] **#5:** Deterministic interactive button handler (`confirm_*`, `reschedule_*`, `cancel_*`) con zero token LLM e latenza sub-secondo (Chiusa con PR #14)
+
+### Milestone 3: `v0.3.0 - AI Agent & Conversational Booking` ✅
+- [x] **#6:** AI Agent Provider abstraction (`BaseAIProvider`, `OpenAIProvider` GPT-4o-mini, `GeminiProvider` Gemini Flash, `MockAIProvider`) (Chiusa con PR #15)
+- [x] **#7:** AI Tool Calling (`get_available_slots`, `book_appointment`, `cancel_appointment`, `escalate_to_human`) e `BookingAgent` multi-turn con memoria (Chiusa con PR #16)
+- [x] **#8:** Outbound lead outreach con messaggio di benvenuto personalizzato e nota vocale autentica OGG/Opus (`POST /discovery/outreach`) (Chiusa con PR #17)
+
+### Milestone 4: `v0.4.0 - Schedulers & Anti No-Show Automation` ✅
+- [x] **#9:** Background reminder scheduler APScheduler per promemoria interattivi T-24h (bottoni rapidi) e finali T-2h (Chiusa con PR #18)
+- [x] **#10:** Trainer Daily Digest mattutino con recap agenda e Human Handover alert d'emergenza con link WhatsApp diretto (Chiusa con PR #19)
 
 ---
 
-## 📚 Documenti Chiave nel Repo
+## 📚 Documenti e Architettura nel Repo
 
 - 📄 `docs/SPECIFICATIONS.md`: Specifiche architetturali e funzionali complete.
-- 📄 `docs/Proposta_Assistente_AI_Personal_Trainer.pdf`: Documento visuale di 2 pagine pronto da inviare al Personal Trainer.
-- 📄 `docs/proposta_pt.html`: Sorgente HTML utilizzato per generare il PDF.
-- ⚙️ `.github/workflows/ci.yml`: Pipeline di CI per test e linting automatico su Python 3.10, 3.11, 3.12.
+- 📄 `docs/Proposta_Assistente_AI_Personal_Trainer.pdf`: Proposta commerciale visuale pronta per il PT.
+- 📄 `docs/proposta_pt.html`: Sorgente HTML della proposta PT.
+- ⚙️ `.github/workflows/ci.yml`: Pipeline di continuous integration multi-versione (3.10, 3.11, 3.12).
+- 🧩 Moduli applicativi in `src/coach_flow/`:
+  - `domain/`: Entità di dominio, validatori E.164, lifecycle appuntamenti.
+  - `calendar/`: Provider modulari (Google Calendar v3 e Mock in-memory).
+  - `whatsapp/`: Client ufficiale Meta Cloud API, router webhook, sicurezza HMAC e deterministic button handler.
+  - `ai/`: Provider OpenAI / Gemini / Mock, tools di booking e orchestratore `BookingAgent`.
+  - `discovery/`: Servizio di outreach con dispatch note vocali per nuovi prospect.
+  - `scheduler/`: APScheduler per promemoria T-24h e T-2h anti no-show.
+  - `assistant/`: Daily digest mattutino per il PT e alert di emergenza per subentro umano.
 
 ---
 
-## 📋 Milestones e Issues su GitHub
+## 🚀 Istruzioni per Avvio e Testing Locale
 
-### Milestone 1: `v0.1.0 - Foundation & Modular Calendar Provider` ✅ (100% COMPLETATA)
-- [x] **#1:** Project scaffold, CI/CD, linting and base configuration (PR iniziale)
-- [x] **#2:** Core domain entities & data models (Trainer, Client, Appointment, Slot) (Chiusa con PR #11)
-- [x] **#3:** Modular Calendar Provider abstraction & Google Calendar implementation (Chiusa con PR #12)
+### Esecuzione Test e Linter
+```bash
+source .venv/bin/activate
+pytest -v
+ruff check .
+```
 
-### Milestone 2: `v0.2.0 - WhatsApp Cloud API & Deterministic Engine` ✅ (100% COMPLETATA)
-- [x] **#4:** Meta WhatsApp Cloud API client & Webhook verification handler (Chiusa con PR #13)
-- [x] **#5:** Deterministic interactive button handler (Confirm, Reschedule, Cancel) (Chiusa con PR #14)
-
-### Milestone 3: `v0.3.0 - AI Agent & Conversational Booking` 👈 **PROSSIMA MILESTONE**
-- [ ] **#6:** AI Agent Provider abstraction (OpenAI & Gemini support) 👈 **PROSSIMO TASK DA SVILUPPARE**
-- [ ] **#7:** AI Tool Calling: check available slots and book appointments
-- [ ] **#8:** Voice memo (audio note) dispatch for lead discovery outreach
-
-### Milestone 4: `v0.4.0 - Schedulers & Anti No-Show Automation`
-- [ ] **#9:** Background scheduler for interactive T-24h and T-2h reminders
-- [ ] **#10:** Trainer Daily Digest agenda and Human Handover emergency alert
-
----
-
-## 🚀 Prossimo Passo da Eseguire
-
-Lavorare sull'**Issue #6** (Milestone 3):
-1. Creare il branch `feature/#6-ai-agent-provider`.
-2. Definire l'interfaccia astratta `BaseAIProvider` in `src/coach_flow/ai/base.py` con supporto a system prompt, memory/chat history e tool execution.
-3. Implementare il provider Gemini (`GeminiAIProvider`) e/o OpenAI (`OpenAIAgentProvider`).
-4. Scrivere i relativi test in `tests/test_ai_provider.py`.
-5. Verificare con `pytest` e `ruff check .`.
-6. Aprire Pull Request verso `main` per chiudere l'Issue #6.
+### Avvio Server API
+```bash
+uvicorn coach_flow.main:app --host 0.0.0.0 --port 8000 --reload
+```
+Documentazione interattiva OpenAPI disponibile su: `http://localhost:8000/docs`.
