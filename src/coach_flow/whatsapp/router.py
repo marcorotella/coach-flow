@@ -1,11 +1,12 @@
 """Meta WhatsApp Cloud API Webhook Endpoints and Message Dispatcher."""
 
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response, status
 
 from coach_flow.config import settings
+from coach_flow.whatsapp.deterministic import deterministic_handler
 from coach_flow.whatsapp.models import WhatsAppWebhookPayload
 from coach_flow.whatsapp.security import verify_webhook_signature
 
@@ -77,8 +78,7 @@ async def receive_webhook(
                     logger.info(
                         f"Button click from {sender_phone}: ID={btn_id}, Title={btn_title}"
                     )
-                    # Deterministic action handlers
-                    await handle_interactive_button(sender_phone, btn_id)
+                    await handle_interactive_button(sender_phone, btn_id, btn_title)
 
                 # Case 2: Free text message
                 elif msg.type == "text" and msg.text:
@@ -90,14 +90,17 @@ async def receive_webhook(
     return {"status": "ok"}
 
 
-async def handle_interactive_button(sender_phone: str, button_id: str) -> None:
+async def handle_interactive_button(
+    sender_phone: str,
+    button_id: str,
+    button_title: Optional[str] = None,
+) -> dict[str, Any]:
     """Zero-LLM deterministic action dispatcher for button replies."""
-    if button_id.startswith("confirm_"):
-        logger.info(f"Confirmed appointment for {sender_phone} ({button_id})")
-    elif button_id.startswith("reschedule_"):
-        logger.info(f"Reschedule requested by {sender_phone} ({button_id})")
-    elif button_id.startswith("cancel_"):
-        logger.info(f"Cancellation requested by {sender_phone} ({button_id})")
+    return await deterministic_handler.handle_button_click(
+        sender_phone=sender_phone,
+        button_id=button_id,
+        button_title=button_title,
+    )
 
 
 async def handle_text_message(sender_phone: str, text: str) -> None:
