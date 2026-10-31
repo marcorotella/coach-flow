@@ -1,18 +1,31 @@
 """Main FastAPI Application Entrypoint."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from coach_flow import __version__
 from coach_flow.assistant.router import router as assistant_router
 from coach_flow.config import settings
 from coach_flow.discovery.router import router as discovery_router
+from coach_flow.storage.database import close_db, init_db
 from coach_flow.whatsapp.router import router as whatsapp_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager initializing database on startup."""
+    await init_db()
+    yield
+    await close_db()
+
 
 app = FastAPI(
     title="CoachFlow API",
     description="AI-powered WhatsApp Assistant for Personal Trainers",
     version=__version__,
     debug=settings.DEBUG,
+    lifespan=lifespan,
 )
 
 # Include Routers

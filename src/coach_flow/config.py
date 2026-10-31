@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     CALENDAR_PROVIDER: str = "google"
     DEFAULT_VOICE_MEMO_URL: str = ""
 
+    # Database Configuration
+    DATABASE_URL: str = "sqlite+aiosqlite:///./coach_flow.db"
+
     # AI Configuration
     AI_PROVIDER: str = "openai"
     OPENAI_API_KEY: str = ""

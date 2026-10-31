@@ -49,3 +49,9 @@ Thumbs.db
 htmlcov/
 .mypy_cache/
 .ruff_cache/
+
+# Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
