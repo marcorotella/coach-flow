@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from coach_flow import __version__
 from coach_flow.config import settings
+from coach_flow.whatsapp.router import router as whatsapp_router
 
 app = FastAPI(
     title="CoachFlow API",
@@ -11,6 +12,9 @@ app = FastAPI(
     version=__version__,
     debug=settings.DEBUG,
 )
+
+# Include Routers
+app.include_router(whatsapp_router)
 
 
 @app.get("/health", tags=["System"])
