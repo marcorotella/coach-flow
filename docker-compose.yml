@@ -1,0 +1,50 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: coachflow:latest
+    container_name: coachflow_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=False
+      - DATABASE_URL=postgresql+asyncpg://coachflow:coachflow_secret@db:5432/coachflow_db
+      - PT_NAME=${PT_NAME:-Coach}
+      - PT_PHONE_NUMBER=${PT_PHONE_NUMBER:-}
+      - META_WA_PHONE_NUMBER_ID=${META_WA_PHONE_NUMBER_ID:-}
+      - META_WA_ACCESS_TOKEN=${META_WA_ACCESS_TOKEN:-}
+      - META_WA_VERIFY_TOKEN=${META_WA_VERIFY_TOKEN:-}
+      - META_WA_APP_SECRET=${META_WA_APP_SECRET:-}
+      - AI_PROVIDER=${AI_PROVIDER:-openai}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - AI_MODEL_NAME=${AI_MODEL_NAME:-gpt-4o-mini}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: coachflow_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coachflow
+      POSTGRES_PASSWORD: coachflow_secret
+      POSTGRES_DB: coachflow_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coachflow -d coachflow_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres_data:
+    driver: local

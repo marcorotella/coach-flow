@@ -1,0 +1,66 @@
+# Git & Version Control
+.git/
+.gitignore
+.github/
+
+# Python & Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Quality
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+tests/
+
+# Documentation & Markdown files (Keep README.md and LICENSE for package build)
+docs/
+*.md
+!README.md
+!LICENSE
+
+# Secrets & Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database & Local Volumes
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+postgres_data/
+
+# OS artifacts
+.DS_Store
+Thumbs.db

@@ -18,6 +18,8 @@
 - 🛎️ **Daily Digest per il Coach:** Ricevi ogni mattina su WhatsApp la lista degli atleti del giorno e un promemoria 30 minuti prima di ciascuna sessione.
 - 🛡️ **Canale Ufficiale Meta:** Zero rischi di ban del numero, supporto a template pre-approvati e piena conformità GDPR.
 - 🔌 **Architettura Modulare:** Interfacce astratte per Calendar Provider (`GoogleCalendar`, `Cal.com`, `Apple`) e AI Provider (`OpenAI`, `Gemini`).
+- 🗄️ **Persistenza Asincrona:** Supporto completo a SQLAlchemy 2.0 Async con switch immediato tra SQLite (sviluppo) e PostgreSQL (produzione).
+- 🐳 **Containerizzazione Multi-Stage Ultra-Slim:** Immagine Docker minimale conforme alle best practice di sicurezza (build multi-stage senza layer intermedi di compilazione, utente non-root `coachflow`, healthcheck integrato).
 
 ---
 
@@ -69,6 +71,30 @@ cp .env.example .env
 ```bash
 uvicorn coach_flow.main:app --reload --port 8000
 ```
+
+---
+
+## 🐳 Avvio con Docker & Docker Compose (Produzione)
+
+L'applicazione include un `Dockerfile` multi-stage moderno e ottimizzato:
+- **Build stage isolato:** I compilatori (`gcc`, `build-essential`) e la cache pip vengono scartati e non finiscono mai nell'immagine finale.
+- **Runtime stage minimale:** Basato su Debian Bookworm slim con le sole dipendenze di runtime essenziali (`curl`, `ca-certificates`, `libpq5`).
+- **Sicurezza:** Esecuzione sotto utente unprivileged non-root (`coachflow:coachflow`, UID 10001).
+- **Database PostgreSQL:** Connessione asincrona (`asyncpg`) e verifica dello stato con healthcheck.
+
+### Avvio rapido dello stack (App + PostgreSQL):
+```bash
+# Avvia PostgreSQL e l'API FastAPI in background
+docker compose up -d --build
+
+# Verifica lo stato e gli healthcheck dei container
+docker compose ps
+
+# Visualizza i log in streaming
+docker compose logs -f app
+```
+
+L'API sarà disponibile su `http://localhost:8000` con documentazione interattiva su `http://localhost:8000/docs`.
 
 ---
 
