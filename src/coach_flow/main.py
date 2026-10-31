@@ -1,6 +1,7 @@
 """Main FastAPI Application Entrypoint."""
 
 from fastapi import FastAPI
+
 from coach_flow import __version__
 from coach_flow.config import settings
 
