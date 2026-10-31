@@ -11,7 +11,8 @@ Questo documento serve a trasferire il contesto operativo completo dell'attivit�
 - **Licenza:** MIT
 - **Directory di lavoro su `ai-terminal`:** `/home/marco/projects/coach-flow`
 - **Ambiente Python:** Python 3.11 con venv in `/home/marco/projects/coach-flow/.venv` (FastAPI, Pydantic, APScheduler, Pytest, Ruff)
-- **Stato Test:** 2 test passing (`pytest`)
+- **Stato Test:** 25 test passing (`pytest`), 0 errori di linting (`ruff check .`)
+- **CI Pipeline:** Green su GitHub Actions (Python 3.10, 3.11, 3.12)
 
 ---
 
@@ -36,19 +37,17 @@ Assistente AI su WhatsApp per Personal Trainer:
 
 ## 📋 Milestones e Issues su GitHub
 
-Tutte le milestone e le issue sono già create su GitHub:
+### Milestone 1: `v0.1.0 - Foundation & Modular Calendar Provider` ✅ (100% COMPLETATA)
+- [x] **#1:** Project scaffold, CI/CD, linting and base configuration (PR iniziale)
+- [x] **#2:** Core domain entities & data models (Trainer, Client, Appointment, Slot) (Chiusa con PR #11)
+- [x] **#3:** Modular Calendar Provider abstraction & Google Calendar implementation (Chiusa con PR #12)
 
-### Milestone 1: `v0.1.0 - Foundation & Modular Calendar Provider`
-- [x] **#1:** Project scaffold, CI/CD, linting and base configuration (Completata con PR/commit iniziale)
-- [ ] **#2:** Core domain entities & data models (Trainer, Client, Appointment, Slot) 👈 **PROSSIMO TASK DA SVILUPPARE**
-- [ ] **#3:** Modular Calendar Provider abstraction & Google Calendar implementation
+### Milestone 2: `v0.2.0 - WhatsApp Cloud API & Deterministic Engine` ✅ (100% COMPLETATA)
+- [x] **#4:** Meta WhatsApp Cloud API client & Webhook verification handler (Chiusa con PR #13)
+- [x] **#5:** Deterministic interactive button handler (Confirm, Reschedule, Cancel) (Chiusa con PR #14)
 
-### Milestone 2: `v0.2.0 - WhatsApp Cloud API & Deterministic Engine`
-- [ ] **#4:** Meta WhatsApp Cloud API client & Webhook verification handler
-- [ ] **#5:** Deterministic interactive button handler (Confirm, Reschedule, Cancel)
-
-### Milestone 3: `v0.3.0 - AI Agent & Conversational Booking`
-- [ ] **#6:** AI Agent Provider abstraction (OpenAI & Gemini support)
+### Milestone 3: `v0.3.0 - AI Agent & Conversational Booking` 👈 **PROSSIMA MILESTONE**
+- [ ] **#6:** AI Agent Provider abstraction (OpenAI & Gemini support) 👈 **PROSSIMO TASK DA SVILUPPARE**
 - [ ] **#7:** AI Tool Calling: check available slots and book appointments
 - [ ] **#8:** Voice memo (audio note) dispatch for lead discovery outreach
 
@@ -58,15 +57,12 @@ Tutte le milestone e le issue sono già create su GitHub:
 
 ---
 
-## 🚀 Prossimo Passo da Eseguire nella Nuova Sessione
+## 🚀 Prossimo Passo da Eseguire
 
-Lavorare sull'**Issue #2**:
-1. Creare il branch `feature/#2-core-domain-models`.
-2. Definire i modelli Pydantic in `src/coach_flow/domain/`:
-   - `Trainer` (id, name, phone, availability_window, session_duration_minutes)
-   - `Client` / `Lead` (id, name, phone, notes, status: lead | active | paused)
-   - `TimeSlot` (start_time, end_time, is_available)
-   - `Appointment` (id, trainer_id, client_id, start_time, end_time, status: scheduled | confirmed | rescheduled | cancelled)
-3. Scrivere i relativi test in `tests/test_domain_models.py`.
-4. Eseguire `pytest` e `ruff check .`.
-5. Aprire Pull Request verso `main` per chiudere l'Issue #2.
+Lavorare sull'**Issue #6** (Milestone 3):
+1. Creare il branch `feature/#6-ai-agent-provider`.
+2. Definire l'interfaccia astratta `BaseAIProvider` in `src/coach_flow/ai/base.py` con supporto a system prompt, memory/chat history e tool execution.
+3. Implementare il provider Gemini (`GeminiAIProvider`) e/o OpenAI (`OpenAIAgentProvider`).
+4. Scrivere i relativi test in `tests/test_ai_provider.py`.
+5. Verificare con `pytest` e `ruff check .`.
+6. Aprire Pull Request verso `main` per chiudere l'Issue #6.
