@@ -11,7 +11,7 @@ Progetto **CoachFlow** (`coach-flow`): assistente AI per Personal Trainer su Wha
 - **Licenza:** MIT
 - **Directory di lavoro su `ai-terminal`:** `/home/marco/projects/coach-flow`
 - **Ambiente Python:** Python 3.11 con venv in `/home/marco/projects/coach-flow/.venv` (FastAPI, Pydantic, APScheduler, Pytest, Ruff)
-- **Stato Test:** **48/48 test passing** (`pytest`), **0 errori o warning di linting** (`ruff check .`)
+- **Stato Test:** **54/54 test passing** (`pytest`), **0 errori o warning di linting** (`ruff check .`)
 - **CI Pipeline:** Green su GitHub Actions per tutti i commit e PR su Python 3.10, 3.11 e 3.12.
 
 ---
@@ -37,6 +37,16 @@ Tutte le milestone e le 10 issue originali del progetto sono state implementate,
 ### Milestone 4: `v0.4.0 - Schedulers & Anti No-Show Automation` ✅
 - [x] **#9:** Background reminder scheduler APScheduler per promemoria interattivi T-24h (bottoni rapidi) e finali T-2h (Chiusa con PR #18)
 - [x] **#10:** Trainer Daily Digest mattutino con recap agenda e Human Handover alert d'emergenza con link WhatsApp diretto (Chiusa con PR #19)
+
+### Milestone 5: `v0.5.0 - Database Persistence Layer` ✅
+- [x] **Persistenza Asincrona con SQLAlchemy 2.0:** Supporto duale per SQLite (`aiosqlite`) in locale e PostgreSQL (`asyncpg`) in produzione.
+- [x] **Modelli ORM & Repository Pattern:** `TrainerModel`, `ClientModel`, `AppointmentModel` e `SQLAlchemyRepository` per gestione CRUD atomica (Chiusa con PR #20).
+
+### Milestone 6: `v0.6.0 - Production Containerization & Cloud Readiness` ✅
+- [x] **Dockerfile Multi-Stage Ultra-Slim:** Architettura a due stadi (`builder` -> `runner`). Tutti i compilatori (`gcc`, `build-essential`) e la cache pip rimangono isolati nel layer di build e vengono esclusi dall'immagine finale di produzione.
+- [x] **Sicurezza & Hardening:** Esecuzione con utente unprivileged `coachflow` (UID 10001), `ca-certificates` per TLS verso Meta/AI APIs, e `HEALTHCHECK` integrato su `/health`.
+- [x] **Docker Compose Stack:** Orchestrazione per API e PostgreSQL 16 Alpine con healthcheck (`pg_isready`) e volume persistente.
+- [x] **Dockerignore Rigoroso:** Esclusione completa di codice sorgente di test, cache, virtualenv e file di configurazione sensibili.
 
 ---
 
