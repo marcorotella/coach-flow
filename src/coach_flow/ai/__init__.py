@@ -2,11 +2,13 @@
 
 from typing import Optional
 
+from coach_flow.ai.agent import BookingAgent
 from coach_flow.ai.base import BaseAIProvider
 from coach_flow.ai.gemini import GeminiProvider
 from coach_flow.ai.mock import MockAIProvider
 from coach_flow.ai.models import AIResponse, AIToolCall, AIToolDefinition, ChatMessage
 from coach_flow.ai.openai import OpenAIProvider
+from coach_flow.ai.tools import BOOKING_TOOLS, BookingToolExecutor
 from coach_flow.config import settings
 
 
@@ -36,4 +38,7 @@ __all__ = [
     "AIToolCall",
     "AIResponse",
     "get_ai_provider",
+    "BookingAgent",
+    "BookingToolExecutor",
+    "BOOKING_TOOLS",
 ]

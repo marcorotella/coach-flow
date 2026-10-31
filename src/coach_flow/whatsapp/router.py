@@ -5,13 +5,32 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response, status
 
+from coach_flow.ai import get_ai_provider
+from coach_flow.ai.agent import BookingAgent
+from coach_flow.ai.mock import MockAIProvider
+from coach_flow.calendar.mock import MockCalendarProvider
 from coach_flow.config import settings
+from coach_flow.whatsapp.client import WhatsAppClient
 from coach_flow.whatsapp.deterministic import deterministic_handler
 from coach_flow.whatsapp.models import WhatsAppWebhookPayload
 from coach_flow.whatsapp.security import verify_webhook_signature
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/whatsapp", tags=["WhatsApp"])
+
+
+def _create_default_agent() -> BookingAgent:
+    try:
+        ai_provider = get_ai_provider()
+    except Exception:
+        ai_provider = MockAIProvider()
+    calendar_provider = MockCalendarProvider()
+    return BookingAgent(ai_provider=ai_provider, calendar_provider=calendar_provider)
+
+
+# Module-level instances for message handling
+booking_agent: BookingAgent = _create_default_agent()
+whatsapp_client: WhatsAppClient = WhatsAppClient()
 
 
 @router.get("/webhook")
@@ -84,7 +103,6 @@ async def receive_webhook(
                 elif msg.type == "text" and msg.text:
                     user_text = msg.text.body
                     logger.info(f"Incoming text from {sender_phone}: {user_text}")
-                    # AI Conversational handler will be plugged here
                     await handle_text_message(sender_phone, user_text)
 
     return {"status": "ok"}
@@ -103,6 +121,12 @@ async def handle_interactive_button(
     )
 
 
-async def handle_text_message(sender_phone: str, text: str) -> None:
+async def handle_text_message(sender_phone: str, text: str) -> str:
     """Conversational text handler (AI Agent integration)."""
-    pass
+    reply = await booking_agent.handle_incoming_message(sender_phone, text)
+    if whatsapp_client.access_token:
+        try:
+            await whatsapp_client.send_text_message(sender_phone, reply)
+        except Exception as exc:
+            logger.warning(f"Could not send WhatsApp text reply to {sender_phone}: {exc}")
+    return reply
