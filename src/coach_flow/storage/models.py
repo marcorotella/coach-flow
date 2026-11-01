@@ -41,6 +41,7 @@ class ClientModel(Base):
     fitness_goals: Mapped[str] = mapped_column(Text, nullable=True)
     medical_notes: Mapped[str] = mapped_column(Text, nullable=True)
     notes: Mapped[str] = mapped_column(Text, nullable=True)
+    is_ai_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

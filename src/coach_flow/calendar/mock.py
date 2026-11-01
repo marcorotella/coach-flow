@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import uuid4
 
 from coach_flow.calendar.base import BaseCalendarProvider
-from coach_flow.domain.models import Appointment, TimeSlot
+from coach_flow.domain.models import Appointment, TimeSlot, WorkingHours
 
 
 class MockCalendarProvider(BaseCalendarProvider):
@@ -26,6 +26,7 @@ class MockCalendarProvider(BaseCalendarProvider):
         end_date: date,
         duration_minutes: int = 60,
         buffer_minutes: int = 15,
+        working_hours: Optional[list[WorkingHours]] = None,
     ) -> list[TimeSlot]:
         slots: list[TimeSlot] = []
         curr_date = start_date
@@ -34,33 +35,46 @@ class MockCalendarProvider(BaseCalendarProvider):
         slot_duration = timedelta(minutes=duration_minutes)
 
         while curr_date <= end_date:
-            day_start = datetime.combine(
-                curr_date, time(self.daily_start_hour, 0), tzinfo=timezone.utc
-            )
-            day_end = datetime.combine(
-                curr_date, time(self.daily_end_hour, 0), tzinfo=timezone.utc
-            )
+            weekday = curr_date.weekday()
 
-            current_cursor = day_start
-            while current_cursor + slot_duration <= day_end:
-                slot_end = current_cursor + slot_duration
-
-                # Check conflict against existing scheduled events
-                is_busy = any(
-                    ev["start"] < slot_end and ev["end"] > current_cursor
-                    for ev in self.events.values()
+            # Determine working intervals for current day
+            windows: list[tuple[datetime, datetime]] = []
+            if working_hours is not None:
+                day_whs = [wh for wh in working_hours if wh.day_of_week == weekday]
+                for wh in day_whs:
+                    w_start = datetime.combine(curr_date, wh.start_time, tzinfo=timezone.utc)
+                    w_end = datetime.combine(curr_date, wh.end_time, tzinfo=timezone.utc)
+                    windows.append((w_start, w_end))
+            else:
+                day_start = datetime.combine(
+                    curr_date, time(self.daily_start_hour, 0), tzinfo=timezone.utc
                 )
+                day_end = datetime.combine(
+                    curr_date, time(self.daily_end_hour, 0), tzinfo=timezone.utc
+                )
+                windows.append((day_start, day_end))
 
-                if not is_busy:
-                    slots.append(
-                        TimeSlot(
-                            start_time=current_cursor,
-                            end_time=slot_end,
-                            is_available=True,
-                        )
+            for w_start, w_end in windows:
+                current_cursor = w_start
+                while current_cursor + slot_duration <= w_end:
+                    slot_end = current_cursor + slot_duration
+
+                    # Check conflict against existing scheduled events
+                    is_busy = any(
+                        ev["start"] < slot_end and ev["end"] > current_cursor
+                        for ev in self.events.values()
                     )
 
-                current_cursor += total_step
+                    if not is_busy:
+                        slots.append(
+                            TimeSlot(
+                                start_time=current_cursor,
+                                end_time=slot_end,
+                                is_available=True,
+                            )
+                        )
+
+                    current_cursor += total_step
 
             curr_date += timedelta(days=1)
 

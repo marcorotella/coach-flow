@@ -101,6 +101,7 @@ class Client(BaseModel):
     fitness_goals: Optional[str] = None
     medical_notes: Optional[str] = None
     notes: Optional[str] = None
+    is_ai_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     @model_validator(mode="before")
@@ -152,6 +153,10 @@ class Appointment(BaseModel):
         if self.end_time <= self.start_time:
             raise ValueError("Appointment end_time must be after start_time")
         return self
+
+    @property
+    def duration_minutes(self) -> int:
+        return int((self.end_time - self.start_time).total_seconds() / 60)
 
     def confirm(self) -> None:
         """Mark appointment as confirmed by the client."""

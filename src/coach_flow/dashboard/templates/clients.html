@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block header_title %}Atleti & Lead{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Quick Add Form -->
+  <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm" x-data="{ open: false }">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="font-bold text-slate-900 text-base">Anagrafica Atleti</h3>
+        <p class="text-xs text-slate-500">Gestisci i tuoi clienti e controlla se l'agente AI deve rispondere in automatico o lasciare a te la chat.</p>
+      </div>
+      <button @click="open = !open" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-lg transition">
+        <span x-show="!open">+ Aggiungi Nuovo Atleta / Lead</span>
+        <span x-show="open">Chiudi Modulo</span>
+      </button>
+    </div>
+
+    <form x-show="open" method="POST" action="/dashboard/clients/new" class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Nome Completo</label>
+        <input type="text" name="name" required placeholder="Es. Marco Rossi" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Telefono (E.164)</label>
+        <input type="text" name="phone_number" required placeholder="+393331234567" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Obiettivi Fitness</label>
+        <input type="text" name="fitness_goals" placeholder="Es. Ipertrofia, Dimagrimento" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs transition">
+          Salva nel Database
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Clients List Table -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+      <h3 class="font-bold text-slate-900 text-base">Elenco Atleti e Lead ({{ clients|length }})</h3>
+    </div>
+
+    {% if clients %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-slate-600">
+        <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+          <tr>
+            <th class="px-5 py-3">Atleta</th>
+            <th class="px-5 py-3">Telefono WhatsApp</th>
+            <th class="px-5 py-3">Stato</th>
+            <th class="px-5 py-3">Obiettivo</th>
+            <th class="px-5 py-3 text-center">Agente AI</th>
+            <th class="px-5 py-3 text-right">Contatta</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for client in clients %}
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-5 py-3.5 font-semibold text-slate-900 whitespace-nowrap">
+              {{ client.name }}
+            </td>
+            <td class="px-5 py-3.5 text-xs text-slate-600 font-mono">
+              {{ client.phone_number }}
+            </td>
+            <td class="px-5 py-3.5">
+              {% if client.status.value == 'active' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">Attivo</span>
+              {% elif client.status.value == 'lead' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">Lead</span>
+              {% elif client.status.value == 'paused' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-800">In Pausa</span>
+              {% else %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-800">{{ client.status.value }}</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-3.5 text-xs text-slate-500 max-w-xs truncate">
+              {{ client.fitness_goals or '-' }}
+            </td>
+            <td class="px-5 py-3.5 text-center">
+              <form method="POST" action="/dashboard/clients/{{ client.id }}/toggle-ai" class="inline">
+                {% if client.is_ai_active %}
+                <button type="submit" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-brand-100 text-brand-800 hover:bg-brand-200 transition" title="Clicca per mettere in pausa l'AI per questo cliente">
+                  🤖 AI Attiva
+                </button>
+                {% else %}
+                <button type="submit" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 transition" title="Clicca per riattivare l'AI">
+                  ⏸️ In Pausa (Manuale)
+                </button>
+                {% endif %}
+              </form>
+            </td>
+            <td class="px-5 py-3.5 text-right whitespace-nowrap">
+              <a href="https://wa.me/{{ client.phone_number.replace('+', '') }}" target="_blank" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition">
+                Apri Chat 💬
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="p-8 text-center text-slate-500">
+      <p class="font-medium text-slate-700">Nessun atleta o lead ancora registrato.</p>
+      <p class="text-xs text-slate-400 mt-1">Usa il pulsante in alto o attendi i messaggi in ingresso da WhatsApp.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

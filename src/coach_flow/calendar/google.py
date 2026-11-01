@@ -8,7 +8,7 @@ from typing import Optional
 import httpx
 
 from coach_flow.calendar.base import BaseCalendarProvider
-from coach_flow.domain.models import Appointment, TimeSlot
+from coach_flow.domain.models import Appointment, TimeSlot, WorkingHours
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,7 @@ class GoogleCalendarProvider(BaseCalendarProvider):
         end_date: date,
         duration_minutes: int = 60,
         buffer_minutes: int = 15,
+        working_hours: Optional[list[WorkingHours]] = None,
     ) -> list[TimeSlot]:
         """Query Google Calendar freebusy endpoint to compute non-overlapping slots."""
         time_min = datetime.combine(
@@ -76,31 +77,43 @@ class GoogleCalendarProvider(BaseCalendarProvider):
             for b in busy_intervals
         ]
 
-        # Calculate open slots
+        # Calculate open slots respecting working hours and busy intervals
         slots: list[TimeSlot] = []
         curr = start_date
         total_step = timedelta(minutes=duration_minutes + buffer_minutes)
         slot_dur = timedelta(minutes=duration_minutes)
 
         while curr <= end_date:
-            day_start = datetime.combine(
-                curr, datetime.min.time(), tzinfo=timezone.utc
-            ).replace(hour=9)
-            day_end = datetime.combine(
-                curr, datetime.min.time(), tzinfo=timezone.utc
-            ).replace(hour=19)
+            weekday = curr.weekday()
+            windows: list[tuple[datetime, datetime]] = []
+            if working_hours is not None:
+                day_whs = [wh for wh in working_hours if wh.day_of_week == weekday]
+                for wh in day_whs:
+                    w_start = datetime.combine(curr, wh.start_time, tzinfo=timezone.utc)
+                    w_end = datetime.combine(curr, wh.end_time, tzinfo=timezone.utc)
+                    windows.append((w_start, w_end))
+            else:
+                day_start = datetime.combine(
+                    curr, datetime.min.time(), tzinfo=timezone.utc
+                ).replace(hour=9)
+                day_end = datetime.combine(
+                    curr, datetime.min.time(), tzinfo=timezone.utc
+                ).replace(hour=19)
+                windows.append((day_start, day_end))
 
-            pointer = day_start
-            while pointer + slot_dur <= day_end:
-                cand_end = pointer + slot_dur
-                is_overlap = any(
-                    b_start < cand_end and b_end > pointer for b_start, b_end in busy_spans
-                )
-                if not is_overlap:
-                    slots.append(
-                        TimeSlot(start_time=pointer, end_time=cand_end, is_available=True)
+            for w_start, w_end in windows:
+                pointer = w_start
+                while pointer + slot_dur <= w_end:
+                    cand_end = pointer + slot_dur
+                    is_overlap = any(
+                        b_start < cand_end and b_end > pointer for b_start, b_end in busy_spans
                     )
-                pointer += total_step
+                    if not is_overlap:
+                        slots.append(
+                            TimeSlot(start_time=pointer, end_time=cand_end, is_available=True)
+                        )
+                    pointer += total_step
+
             curr += timedelta(days=1)
 
         return slots

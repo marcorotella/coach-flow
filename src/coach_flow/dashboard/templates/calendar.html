@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block header_title %}Calendario & Appuntamenti{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Quick Action: Block Slot -->
+  <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <div>
+      <h3 class="font-bold text-slate-900 text-base">Blocco Orario Rapido / Impegno Personale</h3>
+      <p class="text-xs text-slate-500">Hai un impegno straordinario o vuoi bloccare uno slot per te? Inseriscilo qui per renderlo non disponibile.</p>
+    </div>
+    
+    <!-- Quick Form -->
+    <form method="POST" action="/dashboard/calendar/block" class="flex flex-wrap items-center gap-2">
+      <input type="datetime-local" name="start_time" required class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+      <span class="text-xs text-slate-400">a</span>
+      <input type="datetime-local" name="end_time" required class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+      <input type="text" name="notes" placeholder="Motivo (es. Allenamento, Visita)" class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white w-48">
+      <button type="submit" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs transition">
+        🔒 Blocca Slot
+      </button>
+    </form>
+  </div>
+
+  <!-- Appointments Table -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+      <h3 class="font-bold text-slate-900 text-base">Tutti gli Appuntamenti in Agenda</h3>
+      <span class="text-xs text-slate-500 font-medium">Totale: {{ appointments|length }}</span>
+    </div>
+
+    {% if appointments %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-slate-600">
+        <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+          <tr>
+            <th class="px-5 py-3">Data & Ora</th>
+            <th class="px-5 py-3">Atleta / Motivo</th>
+            <th class="px-5 py-3">Durata</th>
+            <th class="px-5 py-3">Stato</th>
+            <th class="px-5 py-3">Promemoria</th>
+            <th class="px-5 py-3 text-right">Azioni</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for app in appointments %}
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-5 py-3.5 font-medium text-slate-900 whitespace-nowrap">
+              {{ app.start_time.strftime('%d/%m/%Y ore %H:%M') }}
+            </td>
+            <td class="px-5 py-3.5">
+              <div class="font-semibold text-slate-900">{{ app.client_name }}</div>
+              <div class="text-xs text-slate-400">{{ app.notes or '-' }}</div>
+            </td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">
+              {{ app.duration_minutes }} min
+            </td>
+            <td class="px-5 py-3.5">
+              {% if app.status.value == 'confirmed' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">Confermato ✅</span>
+              {% elif app.status.value == 'cancelled' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Annullato ❌</span>
+              {% elif app.status.value == 'completed' %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-800">Completato</span>
+              {% else %}
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">In attesa ⏳</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">
+              <span title="T-24h">24h: {% if app.reminder_24h_sent %}✅{% else %}⏳{% endif %}</span>
+              <span class="ml-2" title="T-2h">2h: {% if app.reminder_2h_sent %}✅{% else %}⏳{% endif %}</span>
+            </td>
+            <td class="px-5 py-3.5 text-right">
+              {% if app.status.value != 'cancelled' %}
+              <form method="POST" action="/dashboard/calendar/{{ app.id }}/cancel" class="inline" onsubmit="return confirm('Vuoi annullare questo appuntamento?');">
+                <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-semibold transition">
+                  Annulla
+                </button>
+              </form>
+              {% else %}
+              <span class="text-xs text-slate-400">Annullato</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="p-8 text-center text-slate-500">
+      <p class="font-medium text-slate-700">Nessun appuntamento registrato.</p>
+      <p class="text-xs text-slate-400 mt-1">Gli appuntamenti compariranno qui non appena fissati dal bot su WhatsApp.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

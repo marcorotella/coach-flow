@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CoachFlow - Dashboard{% endblock %}</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full flex flex-col md:flex-row font-sans text-slate-800">
+
+  <!-- Sidebar -->
+  <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between shrink-0">
+    <div>
+      <div class="p-6 border-b border-slate-800 flex items-center space-x-3">
+        <span class="text-3xl">🏋️‍♂️</span>
+        <div>
+          <h1 class="font-bold text-lg leading-tight tracking-wide text-white">CoachFlow</h1>
+          <p class="text-xs text-brand-500 font-medium tracking-wider uppercase">PT Assistant</p>
+        </div>
+      </div>
+      <nav class="p-4 space-y-1">
+        <a href="/dashboard" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {% if active_page == 'overview' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+          <span>📊</span>
+          <span>Panoramica</span>
+        </a>
+        <a href="/dashboard/working-hours" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {% if active_page == 'working_hours' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+          <span>⚙️</span>
+          <span>Orari & Turni</span>
+        </a>
+        <a href="/dashboard/calendar" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {% if active_page == 'calendar' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+          <span>📅</span>
+          <span>Calendario</span>
+        </a>
+        <a href="/dashboard/clients" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {% if active_page == 'clients' %}bg-brand-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %}">
+          <span>👥</span>
+          <span>Atleti & Lead</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-300">Coach: <strong class="text-white">{{ trainer.name }}</strong></span>
+        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" title="Sistema Attivo"></span>
+      </div>
+      <div class="flex space-x-3 pt-1">
+        <a href="/docs" target="_blank" class="text-slate-400 hover:text-brand-500 transition">Swagger API</a>
+        <span>•</span>
+        <a href="/health" target="_blank" class="text-slate-400 hover:text-brand-500 transition">Status</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 flex flex-col overflow-y-auto">
+    <!-- Topbar -->
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-slate-900">{% block header_title %}Dashboard{% endblock %}</h2>
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+          WhatsApp Cloud API: Connesso
+        </span>
+      </div>
+    </header>
+
+    <!-- Notification Banner -->
+    {% if alert_message %}
+    <div class="mx-6 mt-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between">
+      <span>{{ alert_message }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Content Block -->
+    <div class="p-6 flex-1">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+</body>
+</html>

@@ -134,6 +134,13 @@ async def handle_interactive_button(
 async def handle_text_message(sender_phone: str, text: str) -> str:
     """Conversational text handler (AI Agent integration)."""
     from coach_flow.assistant.trainer import HANDOVER_ACK_MESSAGE, TrainerAssistantService
+    from coach_flow.storage.repository import repository
+
+    # Check if AI is explicitly paused for this client from Dashboard
+    client = await repository.get_client_by_phone(sender_phone)
+    if client and not client.is_ai_active:
+        logger.info(f"AI is paused for client {sender_phone}. Skipping automated reply.")
+        return ""
 
     if TrainerAssistantService.check_handover_intent(text):
         assistant = get_trainer_assistant()

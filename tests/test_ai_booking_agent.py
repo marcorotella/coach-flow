@@ -12,7 +12,15 @@ from coach_flow.ai.tools import BookingToolExecutor
 from coach_flow.calendar.mock import MockCalendarProvider
 from coach_flow.config import settings
 from coach_flow.main import app
+from coach_flow.storage.database import close_db, init_db
 from coach_flow.whatsapp.router import booking_agent
+
+
+@pytest.fixture(autouse=True)
+async def setup_test_db():
+    await init_db()
+    yield
+    await close_db()
 
 
 class ScriptedAIProvider(BaseAIProvider):

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import Optional
 
-from coach_flow.domain.models import Appointment, TimeSlot
+from coach_flow.domain.models import Appointment, TimeSlot, WorkingHours
 
 
 class BaseCalendarProvider(ABC):
@@ -17,6 +17,7 @@ class BaseCalendarProvider(ABC):
         end_date: date,
         duration_minutes: int = 60,
         buffer_minutes: int = 15,
+        working_hours: Optional[list[WorkingHours]] = None,
     ) -> list[TimeSlot]:
         """Fetch available time slots between start_date and end_date."""
         pass
