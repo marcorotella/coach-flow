@@ -3,11 +3,11 @@
 import json
 import logging
 from datetime import date, datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Optional
 
 from coach_flow.ai.models import AIToolDefinition
 from coach_flow.calendar.base import BaseCalendarProvider
-from coach_flow.domain.models import Appointment
+from coach_flow.domain.models import Appointment, WorkingHours
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +105,15 @@ class BookingToolExecutor:
         self,
         calendar_provider: BaseCalendarProvider,
         trainer_id: str = "default-trainer",
+        working_hours: Optional[list[WorkingHours]] = None,
+        duration_minutes: int = 60,
+        buffer_minutes: int = 15,
     ) -> None:
         self.calendar_provider = calendar_provider
         self.trainer_id = trainer_id
+        self.working_hours = working_hours
+        self.duration_minutes = duration_minutes
+        self.buffer_minutes = buffer_minutes
 
     async def execute(self, tool_name: str, arguments: dict[str, Any]) -> str:
         """Dispatch tool execution and return JSON string result."""
@@ -134,7 +140,11 @@ class BookingToolExecutor:
         start_date = date.fromisoformat(args["start_date"])
         end_date = date.fromisoformat(args["end_date"])
         slots = await self.calendar_provider.get_free_slots(
-            start_date=start_date, end_date=end_date
+            start_date=start_date,
+            end_date=end_date,
+            duration_minutes=self.duration_minutes,
+            buffer_minutes=self.buffer_minutes,
+            working_hours=self.working_hours,
         )
         return json.dumps(
             {

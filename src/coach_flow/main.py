@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from coach_flow import __version__
 from coach_flow.assistant.router import router as assistant_router
 from coach_flow.config import settings
+from coach_flow.dashboard.router import router as dashboard_router
 from coach_flow.discovery.router import router as discovery_router
 from coach_flow.storage.database import close_db, init_db
 from coach_flow.whatsapp.router import router as whatsapp_router
@@ -29,6 +30,7 @@ app = FastAPI(
 )
 
 # Include Routers
+app.include_router(dashboard_router)
 app.include_router(whatsapp_router)
 app.include_router(discovery_router)
 app.include_router(assistant_router)
@@ -49,5 +51,6 @@ async def health_check():
 async def root():
     return {
         "message": "Welcome to CoachFlow API",
+        "dashboard_url": "/dashboard",
         "docs_url": "/docs",
     }

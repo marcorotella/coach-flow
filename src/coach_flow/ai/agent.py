@@ -8,6 +8,7 @@ from coach_flow.ai.models import ChatMessage
 from coach_flow.ai.tools import BOOKING_TOOLS, BookingToolExecutor
 from coach_flow.calendar.base import BaseCalendarProvider
 from coach_flow.config import settings
+from coach_flow.domain.models import WorkingHours
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,26 @@ class BookingAgent:
         calendar_provider: BaseCalendarProvider,
         system_prompt: str = SYSTEM_PROMPT,
         max_tool_iterations: int = 5,
+        working_hours: Optional[list[WorkingHours]] = None,
+        duration_minutes: int = 60,
+        buffer_minutes: int = 15,
+        trainer_id: str = "default-trainer",
     ) -> None:
         self.ai_provider = ai_provider
         self.calendar_provider = calendar_provider
         self.system_prompt = system_prompt
         self.max_tool_iterations = max_tool_iterations
-        self.tool_executor = BookingToolExecutor(calendar_provider=calendar_provider)
+        self.working_hours = working_hours
+        self.duration_minutes = duration_minutes
+        self.buffer_minutes = buffer_minutes
+        self.trainer_id = trainer_id
+        self.tool_executor = BookingToolExecutor(
+            calendar_provider=calendar_provider,
+            trainer_id=trainer_id,
+            working_hours=working_hours,
+            duration_minutes=duration_minutes,
+            buffer_minutes=buffer_minutes,
+        )
         self.sessions: dict[str, list[ChatMessage]] = {}
 
     def get_session_history(self, session_id: str) -> list[ChatMessage]:

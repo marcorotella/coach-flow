@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block header_title %}Panoramica Generale{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+  <!-- Metrics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Sessioni Oggi</p>
+        <span class="p-2 rounded-lg bg-brand-50 text-brand-600 text-lg">📅</span>
+      </div>
+      <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ stats.today_appointments }}</p>
+      <p class="text-xs text-slate-500 mt-1">Prenotate per la data odierna</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Atleti Totali</p>
+        <span class="p-2 rounded-lg bg-blue-50 text-blue-600 text-lg">👥</span>
+      </div>
+      <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ stats.active_clients }}</p>
+      <p class="text-xs text-slate-500 mt-1">Atleti seguiti dal Coach</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lead Ricevuti</p>
+        <span class="p-2 rounded-lg bg-amber-50 text-amber-600 text-lg">🎯</span>
+      </div>
+      <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ stats.leads_count }}</p>
+      <p class="text-xs text-slate-500 mt-1">Prospect in fase discovery</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Durata / Buffer</p>
+        <span class="p-2 rounded-lg bg-purple-50 text-purple-600 text-lg">⏱️</span>
+      </div>
+      <p class="text-2xl font-extrabold text-slate-900 mt-2">{{ trainer.session_duration_minutes }}m / +{{ trainer.buffer_between_sessions_minutes }}m</p>
+      <p class="text-xs text-slate-500 mt-1">Pausa automatica tra sessioni</p>
+    </div>
+  </div>
+
+  <!-- Today's Schedule -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <h3 class="font-bold text-slate-900 text-lg">Sessioni di Oggi</h3>
+        <p class="text-xs text-slate-500">Sincronizzate con WhatsApp e Google Calendar</p>
+      </div>
+      <a href="/dashboard/calendar" class="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">Vedi intero calendario &rarr;</a>
+    </div>
+
+    {% if today_list %}
+    <div class="divide-y divide-slate-100">
+      {% for app in today_list %}
+      <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition">
+        <div class="flex items-center space-x-4">
+          <div class="text-center font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg text-sm">
+            {{ app.start_time.strftime('%H:%M') }} - {{ app.end_time.strftime('%H:%M') }}
+          </div>
+          <div>
+            <p class="font-semibold text-slate-900">{{ app.client_name }}</p>
+            <p class="text-xs text-slate-500">{{ app.notes or 'Sessione PT' }}</p>
+          </div>
+        </div>
+        <div>
+          {% if app.status.value == 'confirmed' %}
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">Confermato ✅</span>
+          {% elif app.status.value == 'cancelled' %}
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Annullato ❌</span>
+          {% else %}
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">In attesa ⏳</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="p-8 text-center text-slate-500">
+      <p class="text-3xl mb-2">🌴</p>
+      <p class="font-medium text-slate-700">Nessun appuntamento in programma per oggi</p>
+      <p class="text-xs text-slate-400 mt-1">Gli slot liberi sono aperti per le prenotazioni dei tuoi atleti su WhatsApp.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick Working Hours Recap Card -->
+  <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 text-white flex flex-col md:flex-row items-center justify-between shadow-sm">
+    <div class="space-y-1 mb-4 md:mb-0">
+      <h3 class="font-bold text-lg text-white">Gestione Disponibilità & Fasce Orarie</h3>
+      <p class="text-xs text-slate-300 max-w-xl">
+        Ricorda: se ti alleni o hai appuntamenti fuori palestra, puoi segnarli direttamente sul tuo Google Calendar dal telefono come "Occupato", oppure configurare i tuoi turni spezzati (mattina/sera) per chiudere in automatico le pause.
+      </p>
+    </div>
+    <a href="/dashboard/working-hours" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg text-sm shadow transition">
+      Configura Orari & Turni &rarr;
+    </a>
+  </div>
+
+</div>
+{% endblock %}

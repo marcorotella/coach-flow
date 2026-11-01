@@ -11,7 +11,7 @@ Progetto **CoachFlow** (`coach-flow`): assistente AI per Personal Trainer su Wha
 - **Licenza:** MIT
 - **Directory di lavoro su `ai-terminal`:** `/home/marco/projects/coach-flow`
 - **Ambiente Python:** Python 3.11 con venv in `/home/marco/projects/coach-flow/.venv` (FastAPI, Pydantic, APScheduler, Pytest, Ruff)
-- **Stato Test:** **54/54 test passing** (`pytest`), **0 errori o warning di linting** (`ruff check .`)
+- **Stato Test:** **59/59 test passing** (`pytest`), **0 errori o warning di linting** (`ruff check .`)
 - **CI Pipeline:** Green su GitHub Actions per tutti i commit e PR su Python 3.10, 3.11 e 3.12.
 
 ---
@@ -48,10 +48,20 @@ Tutte le milestone e le 10 issue originali del progetto sono state implementate,
 - [x] **Docker Compose Stack:** Orchestrazione per API e PostgreSQL 16 Alpine con healthcheck (`pg_isready`) e volume persistente.
 - [x] **Dockerignore Rigoroso:** Esclusione completa di codice sorgente di test, cache, virtualenv e file di configurazione sensibili.
 
+### Milestone 7: `v0.7.0 - Web Dashboard & Anti-Conflict Availability Engine` ✅
+- [x] **Motore di Disponibilità Anti-Conflitto a 3 Livelli:** Protezione algoritmica di turni spezzati, buffer tra sessioni (15m default), pause personali e sync automatico di eventi personali da Google Calendar (es. allenamento del coach).
+- [x] **Web Dashboard Integrata (FastAPI + Jinja2 + Tailwind + Alpine.js):**
+  - `/dashboard`: Panoramica metrica e sessioni odierne.
+  - `/dashboard/working-hours`: Editor turni settimanali spezzati e buffer.
+  - `/dashboard/calendar`: Visualizzazione agenda e blocco rapido orari.
+  - `/dashboard/clients`: Elenco atleti, lead e switch rapido *AI Attiva / In Pausa*.
+- [x] **Guida Utente per il Personal Trainer:** Creazione di `docs/GUIDA_UTENTE_COACH.md` chiara, operativa e pronta da consegnare al coach.
+
 ---
 
 ## 📚 Documenti e Architettura nel Repo
 
+- 📄 `docs/GUIDA_UTENTE_COACH.md`: Manuale operativo completo e pratico per il Personal Trainer.
 - 📄 `docs/SPECIFICATIONS.md`: Specifiche architetturali e funzionali complete.
 - 📄 `docs/Proposta_Assistente_AI_Personal_Trainer.pdf`: Proposta commerciale visuale pronta per il PT.
 - 📄 `docs/proposta_pt.html`: Sorgente HTML della proposta PT.

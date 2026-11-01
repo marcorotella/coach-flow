@@ -52,6 +52,7 @@ class SQLAlchemyRepository:
                 existing.fitness_goals = client.fitness_goals
                 existing.medical_notes = client.medical_notes
                 existing.notes = client.notes
+                existing.is_ai_active = client.is_ai_active
             else:
                 model = ClientModel(
                     id=client.id,
@@ -62,6 +63,7 @@ class SQLAlchemyRepository:
                     fitness_goals=client.fitness_goals,
                     medical_notes=client.medical_notes,
                     notes=client.notes,
+                    is_ai_active=client.is_ai_active,
                     created_at=client.created_at,
                 )
                 session.add(model)
@@ -90,6 +92,16 @@ class SQLAlchemyRepository:
             if not model:
                 return None
             return self._to_client_domain(model)
+
+        return await self._execute_with_session(_op)
+
+    async def get_all_clients(self, trainer_id: Optional[str] = None) -> list[Client]:
+        async def _op(session: AsyncSession):
+            stmt = select(ClientModel).order_by(ClientModel.created_at.desc())
+            if trainer_id:
+                stmt = stmt.where(ClientModel.trainer_id == trainer_id)
+            res = await session.execute(stmt)
+            return [self._to_client_domain(m) for m in res.scalars().all()]
 
         return await self._execute_with_session(_op)
 
@@ -147,12 +159,15 @@ class SQLAlchemyRepository:
 
         return await self._execute_with_session(_op)
 
-    async def get_all_appointments(self) -> list[Appointment]:
+    async def get_all_appointments(
+        self, trainer_id: Optional[str] = None
+    ) -> list[Appointment]:
         async def _op(session: AsyncSession):
             stmt = select(AppointmentModel).order_by(AppointmentModel.start_time.asc())
+            if trainer_id:
+                stmt = stmt.where(AppointmentModel.trainer_id == trainer_id)
             res = await session.execute(stmt)
-            models = res.scalars().all()
-            return [self._to_appointment_domain(m) for m in models]
+            return [self._to_appointment_domain(m) for m in res.scalars().all()]
 
         return await self._execute_with_session(_op)
 
@@ -236,6 +251,41 @@ class SQLAlchemyRepository:
 
         return await self._execute_with_session(_op)
 
+    async def get_or_create_default_trainer(self) -> Trainer:
+        """Fetch or automatically initialize the primary trainer with default schedule."""
+        from coach_flow.config import settings
+
+        trainer_id = "default"
+        existing = await self.get_trainer(trainer_id)
+        if existing:
+            return existing
+
+        # Default schedule: Mon-Fri morning (08:00-12:30) & afternoon (15:30-20:00),
+        # Sat morning (08:30-13:00)
+        default_wh = [
+            WorkingHours(day_of_week=d, start_time=time(8, 0), end_time=time(12, 30))
+            for d in range(5)
+        ] + [
+            WorkingHours(day_of_week=d, start_time=time(15, 30), end_time=time(20, 0))
+            for d in range(5)
+        ] + [
+            WorkingHours(day_of_week=5, start_time=time(8, 30), end_time=time(13, 0))
+        ]
+
+        phone = settings.PT_PHONE_NUMBER or "+393000000000"
+        if not phone.startswith("+"):
+            phone = f"+{phone}"
+
+        trainer = Trainer(
+            id=trainer_id,
+            name=settings.PT_NAME or "Coach",
+            phone_number=phone,
+            session_duration_minutes=60,
+            buffer_between_sessions_minutes=15,
+            working_hours=default_wh,
+        )
+        return await self.save_trainer(trainer)
+
     # ------------------ Domain Mappers ------------------
 
     @staticmethod
@@ -278,6 +328,7 @@ class SQLAlchemyRepository:
             fitness_goals=model.fitness_goals,
             medical_notes=model.medical_notes,
             notes=model.notes,
+            is_ai_active=getattr(model, "is_ai_active", True),
             created_at=model.created_at,
         )
 
