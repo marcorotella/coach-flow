@@ -102,6 +102,7 @@ L'API sarà disponibile su `http://localhost:8000` con documentazione interattiv
 
 ## 📚 Documentazione di Progetto
 
+- [Guida per la Creazione dell'Ambiente di Test (GUIDA_AMBIENTE_TEST.md)](docs/GUIDA_AMBIENTE_TEST.md)
 - [Manuale Pratico per il Personal Trainer (GUIDA_UTENTE_COACH.md)](docs/GUIDA_UTENTE_COACH.md)
 - [Specifiche Funzionali e Tecniche Complete](docs/SPECIFICATIONS.md)
 - [Proposta Esecutiva Personal Trainer (PDF)](docs/Proposta_Assistente_AI_Personal_Trainer.pdf)

@@ -61,6 +61,7 @@ Tutte le milestone e le 10 issue originali del progetto sono state implementate,
 
 ## 📚 Documenti e Architettura nel Repo
 
+- 📄 `docs/GUIDA_AMBIENTE_TEST.md`: Guida operativa per allestire un ambiente di test (locale/mock o con WhatsApp sandbox e ngrok).
 - 📄 `docs/GUIDA_UTENTE_COACH.md`: Manuale operativo completo e pratico per il Personal Trainer.
 - 📄 `docs/SPECIFICATIONS.md`: Specifiche architetturali e funzionali complete.
 - 📄 `docs/Proposta_Assistente_AI_Personal_Trainer.pdf`: Proposta commerciale visuale pronta per il PT.
